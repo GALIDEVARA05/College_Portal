@@ -13,27 +13,28 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
 
   const fetchAdminProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/auth/profile", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      const admin = res.data.data; // extract inner data
+    const admin = res.data.data;
 
-      setAdminData(admin);
-      setFormData({
-        name: admin.name || "",
-        email: admin.email || "",
-        password: "",
-      });
-      localStorage.setItem("user", JSON.stringify(admin));
-    } catch (err) {
-      console.error("Error fetching admin profile", err);
-    }
-  };
+    setAdminData(admin);
+    setFormData({
+      name: admin.name || "",
+      email: admin.email || "",
+      password: "",
+    });
+    localStorage.setItem("user", JSON.stringify(admin));
+  } catch (err) {
+    console.error("Error fetching admin profile", err);
+  }
+};
+
 
   useEffect(() => {
     fetchAdminProfile();
@@ -59,7 +60,7 @@ const AdminDashboard = () => {
     const token = localStorage.getItem("token");
 
     const res = await axios.put(
-      "http://localhost:5000/api/admin/update-profile",
+  `${import.meta.env.VITE_API_URL}/api/admin/update-profile`,
       {
         name: formData.name,
         email: formData.email,

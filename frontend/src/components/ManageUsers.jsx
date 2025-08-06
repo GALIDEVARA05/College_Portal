@@ -19,21 +19,21 @@ const ManageUsers = () => {
   useEffect(() => {
   const fetchAdmins = async () => {
     try {
-      const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-      const res = await axios.get("http://localhost:5000/api/admin/all-admins", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/admin/all-admins`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-      // 🧠 Check if res.data is an object or array
-      const adminsList = Array.isArray(res.data) 
-        ? res.data 
-        : res.data.admins || [];
+  const adminsList = Array.isArray(res.data) 
+    ? res.data 
+    : res.data.admins || [];
 
-      setAdmins(adminsList); // ✅ Now correctly sets the admins
-    } catch (err) {
+  setAdmins(adminsList);
+}
+catch (err) {
       console.error("ERROR FETCHING ADMINS:", err.response?.data || err.message);
       toast.error("Failed to fetch admins");
     }
@@ -48,24 +48,25 @@ const ManageUsers = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/admin/make-admin",
-        { email: emailToAdd },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+await axios.post(
+  `${import.meta.env.VITE_API_URL}/api/admin/make-admin`,
+  { email: emailToAdd },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
       toast.success("✅ Admin created successfully!");
       setEmailToAdd("");
 
       // ✅ Re-fetch updated list (corrected here)
-      const updated = await axios.get("http://localhost:5000/api/admin/all-admins", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const updated = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/all-admins`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
       setAdmins(updated.data); // ✅ fix here
     } catch (err) {
       toast.error("❌ Failed to make admin");
@@ -86,15 +87,16 @@ const ManageUsers = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/admin/remove-admin",
-        { email: selectedAdmin.email },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+await axios.post(
+  `${import.meta.env.VITE_API_URL}/api/admin/remove-admin`,
+  { email: selectedAdmin.email },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
       toast.success("🗑️ Admin removed successfully!");
       setShowModal(false);
       setRefresh(!refresh); // ✅ trigger re-fetch

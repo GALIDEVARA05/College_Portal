@@ -9,31 +9,35 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
 
   const handleAdminLogin = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const response = await axios.post("http://localhost:5000/api/auth/admin-login", {
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/auth/admin-login`,
+      {
         email,
         password,
-      });
-
-      const { message, role, token } = response.data;
-
-      if (role === "main") {
-        toast.success("Main Admin logged in!");
-        localStorage.setItem("token", token);
-        setTimeout(() => navigate("/admin-dashboard"), 1000);
-      } else if (role === "admin") {
-        toast.success("Admin logged in!");
-        localStorage.setItem("token", token);
-        setTimeout(() => navigate("/normal-admin-dashboard"), 1000);
-      } else {
-        toast.error("Unauthorized role!");
       }
-    } catch (err) {
-      toast.error("Login failed. Invalid credentials.");
+    );
+
+    const { message, role, token } = response.data;
+
+    if (role === "main") {
+      toast.success("Main Admin logged in!");
+      localStorage.setItem("token", token);
+      setTimeout(() => navigate("/admin-dashboard"), 1000);
+    } else if (role === "admin") {
+      toast.success("Admin logged in!");
+      localStorage.setItem("token", token);
+      setTimeout(() => navigate("/normal-admin-dashboard"), 1000);
+    } else {
+      toast.error("Unauthorized role!");
     }
-  };
+  } catch (err) {
+    toast.error("Login failed. Invalid credentials.");
+  }
+};
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-300 p-4">
       <Toaster position="top-center" reverseOrder={false} />

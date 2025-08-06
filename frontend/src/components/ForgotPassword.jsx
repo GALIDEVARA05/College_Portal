@@ -29,21 +29,22 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      // Check if email exists
-      const check = await axios.post("http://localhost:5000/api/auth/check-email", { email });
+  // Check if email exists
+  const check = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/check-email`, { email });
 
-      if (!check.data.exists) {
-        toast.error("Email is not registered");
-        setLoading(false);
-        return;
-      }
+  if (!check.data.exists) {
+    toast.error("Email is not registered");
+    setLoading(false);
+    return;
+  }
 
-      // Send OTP
-      const res = await axios.post("http://localhost:5000/api/auth/forgot-password", { email });
-      toast.success(res.data?.message || "OTP sent to your email");
-      navigate("/reset-password", { state: { email } });
+  // Send OTP
+  const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password`, { email });
+  toast.success(res.data?.message || "OTP sent to your email");
+  navigate("/reset-password", { state: { email } });
 
-    } catch (err) {
+}
+catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);

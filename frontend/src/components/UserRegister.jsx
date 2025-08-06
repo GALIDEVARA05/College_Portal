@@ -21,23 +21,24 @@ const UserRegister = () => {
   };
 
   const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post('http://localhost:5000/api/auth/register', form);
-      toast.success("🎉 Registered Successfully!", {
-        position: "top-right",
-        autoClose: 2000,
-        pauseOnHover: false,
-        theme: "colored",
-      });
+  e.preventDefault();
+  try {
+    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, form);
+    toast.success("🎉 Registered Successfully!", {
+      position: "top-right",
+      autoClose: 2000,
+      pauseOnHover: false,
+      theme: "colored",
+    });
 
-      setTimeout(() => {
-        navigate('/user-login');
-      }, 2500);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
-    }
-  };
+    setTimeout(() => {
+      navigate('/user-login');
+    }, 2500);
+  } catch (err) {
+    setError(err.response?.data?.message || 'Registration failed');
+  }
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">

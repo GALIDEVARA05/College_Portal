@@ -9,27 +9,28 @@ const UserDashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = async () => {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-    try {
-      await axios.post(
-        "http://localhost:5000/api/auth/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (err) {
-      console.error("Logout request failed:", err.message);
-    }
+  try {
+    await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  } catch (err) {
+    console.error("Logout request failed:", err.message);
+  }
 
-    // Always clear localStorage and redirect (even if request fails)
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/user-login");
-  };
+  // Always clear localStorage and redirect (even if request fails)
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  navigate("/user-login");
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 to-blue-200 flex flex-col items-center justify-center p-4 relative">
