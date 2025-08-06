@@ -62,7 +62,7 @@ await axios.post(
       setEmailToAdd("");
 
       // ✅ Re-fetch updated list (corrected here)
-      const updated = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/all-admins`, {
+      const updated = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/all-admins`, {
   headers: {
     Authorization: `Bearer ${token}`,
   },

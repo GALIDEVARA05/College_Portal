@@ -13,7 +13,7 @@ const UserDashboard = () => {
 
   try {
     await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
+      `${import.meta.env.VITE_API_URL}/api/auth/logout`,
       {},
       {
         headers: {
