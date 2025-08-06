@@ -20,7 +20,7 @@ connectDB();
 app.use(cors({
   origin: ['https://college-portal-z576.vercel.app'], // your Vercel frontend URL
   credentials: true,
-}));
+}));/**/
 app.use(express.json());
 
 // API Routes
