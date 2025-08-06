@@ -21,7 +21,7 @@ const ManageUsers = () => {
     try {
   const token = localStorage.getItem("token");
 
-  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/admin/all-admins`, {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/all-admins`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

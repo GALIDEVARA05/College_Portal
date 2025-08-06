@@ -15,7 +15,7 @@ const AdminDashboard = () => {
   const fetchAdminProfile = async () => {
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/profile`, {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

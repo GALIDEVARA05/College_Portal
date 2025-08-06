@@ -23,7 +23,7 @@ const UserRegister = () => {
   const handleRegister = async (e) => {
   e.preventDefault();
   try {
-    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, form);
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, form);
     toast.success("🎉 Registered Successfully!", {
       position: "top-right",
       autoClose: 2000,
