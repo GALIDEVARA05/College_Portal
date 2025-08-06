@@ -1,38 +1,29 @@
-// adminController.js
 const User = require("../models/User");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 
-// Make a user admin
 // Make a user admin
 const makeUserAdmin = async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Get the logged-in user performing the action
     const requestingUser = await User.findById(req.user._id);
 
-    if (!requestingUser || (requestingUser.role !== 'admin' && requestingUser.role !== 'main')) {
+    if (!requestingUser || (requestingUser.role !== "admin" && requestingUser.role !== "main")) {
       return res.status(403).json({ message: "Only admins can assign admin roles" });
     }
 
-    // Find the target user to be promoted
     const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Prevent modifying the main admin
-    if (user.role === 'main') {
+    if (user.role === "main") {
       return res.status(403).json({ message: "Main admin role cannot be modified" });
     }
 
-    // If already admin, prevent reassignment
-    if (user.role === 'admin') {
+    if (user.role === "admin") {
       return res.status(400).json({ message: `${email} is already an admin` });
     }
 
-    user.role = 'admin';
+    user.role = "admin";
     await user.save();
 
     res.json({ message: `${email} is now an admin` });
@@ -42,19 +33,14 @@ const makeUserAdmin = async (req, res) => {
   }
 };
 
-
 // Remove admin rights
 const removeAdminRole = async (req, res) => {
   const { email } = req.body;
 
   try {
     const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Prevent demotion of main admin
     if (user.role === "main") {
       return res.status(403).json({ message: "Main admin cannot be demoted" });
     }
@@ -73,37 +59,46 @@ const removeAdminRole = async (req, res) => {
   }
 };
 
+// Special: Transfer main role to another email
+const updateProfile = async (req, res) => {
+  const { name, email, password } = req.body;
 
-
-// Update admin's profile
-const updateAdminDetails = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const currentAdmin = await User.findById(req.user._id);
+    if (!currentAdmin || currentAdmin.role !== "main") {
+      return res.status(403).json({ message: "Only main admin can perform this action" });
+    }
 
-    if (!user) {
+    const newMainUser = await User.findOne({ email });
+    if (!newMainUser) {
+      return res.status(404).json({ message: "Target user not found" });
+    }
+
+    // Update role transfer
+    currentAdmin.role = "user";
+    await currentAdmin.save();
+
+    newMainUser.name = name || newMainUser.name;
+    newMainUser.password = password ? await bcrypt.hash(password, 10) : newMainUser.password;
+    newMainUser.role = "main";
+    await newMainUser.save();
+
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getAllAdmins = async (req, res) => {
+  try {
+    const admins = await User.find({ role: { $in: ["admin", "main"] } }, "name email role");
+    if (!admins || admins.length === 0) {
       return res.status(404).json({ message: "Admin not found" });
     }
-
-    const { name, email, password } = req.body;
-
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
-    }
-
-    await user.save();
-
-    res.json({
-      message: "Admin profile updated successfully",
-      user: {
-        name: user.name,
-        email: user.email
-      }
-    });
+    res.status(200).json(admins);
   } catch (error) {
-    console.error("Error in updateAdminDetails:", error);
+    console.error("Error fetching admins:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -111,5 +106,6 @@ const updateAdminDetails = async (req, res) => {
 module.exports = {
   makeUserAdmin,
   removeAdminRole,
-  updateAdminDetails,
+  updateProfile,
+  getAllAdmins,
 };

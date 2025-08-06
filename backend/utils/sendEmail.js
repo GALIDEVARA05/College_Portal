@@ -11,7 +11,7 @@ const sendEmail = async (to, subject, html) => {
     });
 
     const mailOptions = {
-      from: `"Smart Attendance" <${process.env.EMAIL_USER}>`,
+      from: `"Loki Projects" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,

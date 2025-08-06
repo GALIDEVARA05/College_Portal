@@ -2,8 +2,9 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('../utils/sendEmail');
-
-// Generate JWT
+const Admin = require("../models/Admin");
+const blacklist = new Set();
+// Generate JWT11
 const generateToken = (user) => {
   return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
@@ -139,5 +140,65 @@ exports.resetPassword = async (req, res) => {
     res.status(200).json({ message: 'Password reset successful' });
   } catch (err) {
     res.status(500).json({ message: 'Password reset failed', error: err.message });
+  }
+};
+
+exports.checkEmailExists = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(200).json({ exists: false, message: 'Email not found' });
+    }
+
+    return res.status(200).json({ exists: true, message: 'Email exists' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+exports.logout = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: 'Token missing' });
+    }
+
+    // Optionally verify token (not strictly necessary just to blacklist it)
+    jwt.verify(token, process.env.JWT_SECRET);
+
+    // Add token to blacklist
+    blacklist.add(token);
+
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (err) {
+    console.error('Logout error:', err.message);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+// Utility function for middleware
+exports.getProfile = async (req, res) => {
+  try {
+    const { id, type } = req.user;
+
+    if (type === 'user') {
+      const user = await User.findById(id);
+      if (user) return res.status(200).json({ role: user.role, data: user });
+    } else if (type === 'admin') {
+      const admin = await Admin.findById(id);
+      if (admin) return res.status(200).json({ role: "admin", data: admin });
+    }
+
+    return res.status(404).json({ message: "Profile not found" });
+
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching profile", error: error.message });
   }
 };
