@@ -29,7 +29,11 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const check = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/check-email`, { email });
+      // ✅ Check if email exists and get role from backend
+      const check = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/checkemail`, // ⬅ updated endpoint
+        { email }
+      );
 
       if (!check.data.exists) {
         toast.error("Email is not registered");
@@ -37,9 +41,18 @@ const ForgotPassword = () => {
         return;
       }
 
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password`, { email });
+      const role = check.data.role || "user"; // 👈 get role from API
+
+      // ✅ Send OTP
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/forgot-password`,
+        { email }
+      );
+
       toast.success(res.data?.message || "OTP sent to your email");
-      navigate("/reset-password", { state: { email } });
+
+      // ✅ Pass email & role to ResetPassword
+      navigate("/reset-password", { state: { email, role } });
 
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong");

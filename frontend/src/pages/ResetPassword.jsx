@@ -7,7 +7,9 @@ import "react-toastify/dist/ReactToastify.css";
 const ResetPassword = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+
   const email = state?.email || "";
+  const role = state?.role || "user"; // 👈 role passed from Forgot Password page
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
@@ -21,8 +23,6 @@ const ResetPassword = () => {
       setOtp(updated);
       return;
     }
-
-    // ✅ Handle full OTP paste inside onChange too
     if (value.length > 1) {
       const pasted = value.replace(/\D/g, "").slice(0, 6).split("");
       const updated = [...otp];
@@ -36,14 +36,10 @@ const ResetPassword = () => {
       inputRefs.current[Math.min(pasted.length, 5)]?.focus();
       return;
     }
-
-    // ✅ Handle single digit input
     if (!/^\d$/.test(value)) return;
-
     const updated = [...otp];
     updated[index] = value;
     setOtp(updated);
-
     if (index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -81,15 +77,21 @@ const ResetPassword = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/reset-password`, {
-  email,
-  otp: fullOtp,
-  newPassword,
-});
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/reset-password`,
+        { email, otp: fullOtp, newPassword }
+      );
 
       toast.success(res.data?.message || "Reset Successfully", { position: "top-center" });
 
-      setTimeout(() => navigate("/user-login"), 3000);
+      // 👇 Role-based navigation after success
+      setTimeout(() => {
+        if (role === "admin" || role === "main") {
+          navigate("/admin-login");
+        } else {
+          navigate("/user-login");
+        }
+      }, 3000);
     } catch (err) {
       toast.error(err.response?.data?.message || "Reset failed", { position: "top-center" });
     } finally {

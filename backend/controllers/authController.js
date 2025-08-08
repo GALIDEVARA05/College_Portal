@@ -202,3 +202,27 @@ exports.getProfile = async (req, res) => {
     return res.status(500).json({ message: "Error fetching profile", error: error.message });
   }
 };
+// authController.js
+exports.checkEmail = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  try {
+    const user = await User.findOne({ email }).select("role");
+
+    if (!user) {
+      return res.json({ exists: false });
+    }
+
+    return res.json({
+      exists: true,
+      role: user.role || "user"
+    });
+  } catch (err) {
+    console.error("Error checking email:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

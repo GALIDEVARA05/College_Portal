@@ -10,7 +10,8 @@ const {
   adminLogin,
   checkEmailExists,
   logout,
-  getProfile 
+  getProfile,
+  checkEmail 
 } = require('../controllers/authController');
 
 // Routes for user authentication
@@ -23,6 +24,7 @@ router.post('/check-email', checkEmailExists);
 router.post('/admin-login', adminLogin);         // Dedicated admin login route
 router.post('/logout', logout);
 router.get("/profile", verifyToken, getProfile);
+router.post("/checkemail", checkEmail);
 
 
 module.exports = router;

@@ -40,56 +40,59 @@ const UserLogin = () => {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    setLoading(true);
+  e.preventDefault();
+  if (!validateForm()) return;
+  setLoading(true);
 
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-  email,
-  password,
-});
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      email,
+      password,
+    });
 
-      const userRole = response.data.user.role;
+    const userRole = response.data.user.role;
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-
-      if (rememberMe) {
-        localStorage.setItem("rememberedEmail", email);
-        localStorage.setItem("rememberedPassword", password);
-      } else {
-        localStorage.removeItem("rememberedEmail");
-        localStorage.removeItem("rememberedPassword");
-      }
-
-      toast.success(
-        userRole === "admin"
-          ? "✅ Admin logged in successfully!"
-          : userRole === "main"
-          ? "✅ Main logged in successfully!"
-          : "✅ Logged in successfully!",
-        { position: "top-center", autoClose: 3000 }
-      );
-
-      setTimeout(() => {
-        if (userRole === "admin") {
-          navigate("/normal-admin-dashboard");
-        } else if (userRole === "main") {
-          navigate("/admin-dashboard");
-        } else {
-          navigate("/user-dashboard");
-        }
-      }, 3000);
-    } catch (error) {
-      toast.error("❌ Login failed! Check email or password", {
+    // ❌ Block Admin and Main from logging in
+    if (userRole === "admin" || userRole === "main") {
+      toast.error("❌ Admin's Login Is Not From Here! Go To Admin Login Page", {
         position: "top-center",
         autoClose: 3000,
       });
-    } finally {
       setLoading(false);
+      return;
     }
-  };
+
+    // ✅ Only allow User role
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
+
+    if (rememberMe) {
+      localStorage.setItem("rememberedEmail", email);
+      localStorage.setItem("rememberedPassword", password);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+      localStorage.removeItem("rememberedPassword");
+    }
+
+    toast.success("✅ Logged in successfully!", {
+      position: "top-center",
+      autoClose: 3000,
+    });
+
+    setTimeout(() => {
+      navigate("/user-dashboard");
+    }, 3000);
+
+  } catch (error) {
+    toast.error("❌ Login failed! Check email or password", {
+      position: "top-center",
+      autoClose: 3000,
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     credentialsLoaded && (
