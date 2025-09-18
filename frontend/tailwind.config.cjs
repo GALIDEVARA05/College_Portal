@@ -5,7 +5,16 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        dash: {
+          to: { strokeDashoffset: "-1000" }, // animation for marching effect
+        },
+      },
+      animation: {
+        dash: "dash 12s linear infinite",
+      },
+    },
   },
   plugins: [],
-}
+};

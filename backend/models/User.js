@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['user', 'admin', 'main'],
     default: 'user'
+  },
+  results: {
+    type: Object,
+    default: {}
   }
 });
 

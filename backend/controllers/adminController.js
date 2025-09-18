@@ -1,6 +1,11 @@
+const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
+const { execFile } = require("child_process");
+const router = require("express").Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-
+const verifyAdmin = require("../middleware/verifyAdmin");
 // Make a user admin
 const makeUserAdmin = async (req, res) => {
   const { email } = req.body;
@@ -103,9 +108,23 @@ const getAllAdmins = async (req, res) => {
   }
 };
 
+// multer storage -> temp folder
+const uploadDir = path.join(__dirname, "..", "..", "uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const fname = `upload_${Date.now()}${path.extname(file.originalname)}`;
+    cb(null, fname);
+  }
+});
+const upload = multer({ storage });
+
 module.exports = {
   makeUserAdmin,
   removeAdminRole,
   updateProfile,
   getAllAdmins,
+  router,
 };

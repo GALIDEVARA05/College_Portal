@@ -3,37 +3,54 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
-// Import route files
+const missingStudentsRoutes = require("./routes/missingStudentsRoutes");
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const resultsRoutes = require("./routes/resultsRoutes");
 
-// Load environment variables
+console.log("Loaded resultsRoutes:", resultsRoutes);
+
 dotenv.config();
-
-// Initialize express app
 const app = express();
 
 // Connect to MongoDB
 connectDB();
 
-// Middlewares
-app.use(cors({
-  origin: ['https://college-portal-z576.vercel.app'], // your Vercel frontend URL
-  credentials: true,
-}));/**/
-app.use(express.json());
+// Enable CORS
+app.use(cors());
 
-// API Routes
-app.use("/api/auth", authRoutes);     // Auth routes (login, register, etc.)
-app.use("/api/admin", adminRoutes);   // Admin privilege management routes
+// 🚀 Increase body size + handle timeouts
+app.use(express.json({ limit: "200mb" }));
+app.use(express.urlencoded({ extended: true, limit: "200mb" }));
 
-// Fallback for undefined routes
+// Increase timeout for all requests
+app.use((req, res, next) => {
+  res.setTimeout(10 * 60 * 1000); // 10 minutes
+  next();
+});
+
+/**
+ * 🚀 IMPORTANT:
+ * Mount adminRoutes before express.json()
+ * so file uploads (multipart/form-data) won't get broken
+ */
+app.use("/api/admin", adminRoutes);
+app.use("/api", missingStudentsRoutes);
+
+// Other routes
+app.use("/api/auth", authRoutes);
+app.use("/api/results", resultsRoutes);
+
+// 404 fallback
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// Start the server
+// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
+
+// Increase socket timeout as well (backend side)
+server.setTimeout(600000);

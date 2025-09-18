@@ -11,6 +11,8 @@ import UserDashboard from "./components/UserDashboard";
 import NormalAdminDashboard from "./pages/NormalAdminDashboard";
 import ForgotPassword from "./components/ForgotPassword"; 
 import ResetPassword from "./pages/ResetPassword";
+import ResultsPage from "./pages/ResultsPage";  
+
 
 function App() {
   return (
@@ -20,7 +22,7 @@ function App() {
         <Route path="/user-login" element={<UserLogin />} />
         <Route path="/register" element={<UserRegister />} /> 
         <Route path="/admin-login" element={<AdminLogin />} />
-         <Route path="/user-dashboard" element={<UserDashboard />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/normal-admin-dashboard" element={<NormalAdminDashboard />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -28,6 +30,7 @@ function App() {
         <Route path="/main-admin" element={<MainAdmin />} />
         <Route path="/manage-users" element={<ManageUsers />} />
         <Route path="/upload-pdf" element={<UploadPDF />} />
+        <Route path="/results" element={<ResultsPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -32,4 +32,11 @@ const isAdmin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, isAdmin };
+const isMainAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "main") {
+    return next();
+  }
+  return res.status(403).json({ message: "Only main admin can perform this action" });
+};
+
+module.exports = { protect, isAdmin, isMainAdmin };
